@@ -1,0 +1,16 @@
+# Kind Cluster Configuration
+# Creates a single control-plane node with HTTP port mapping
+#
+# Usage: kind create cluster --name aion-cluster --config kind-cluster.yaml
+#
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+nodes:
+  - role: control-plane
+    extraPortMappings:
+      - containerPort: 30001
+        hostPort: 9001
+        listenAddress: "0.0.0.0"
+      - containerPort: 30002
+        hostPort: 9002
+        listenAddress: "0.0.0.0"

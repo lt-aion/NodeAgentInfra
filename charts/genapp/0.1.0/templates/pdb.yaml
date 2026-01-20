@@ -1,0 +1,20 @@
+{{- if .Values.podDisruptionBudget }}
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ include "genapp.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "genapp.labels" . | nindent 4 }}
+spec:
+{{- if .Values.podDisruptionBudget.minAvailable }}
+  minAvailable: {{ .Values.podDisruptionBudget.minAvailable }}
+{{- end }}
+{{- if .Values.podDisruptionBudget.maxUnavailable }}
+  maxUnavailable: {{ .Values.podDisruptionBudget.maxUnavailable }}
+{{- end }}
+  selector:
+    matchLabels:
+      {{- include "genapp.selectorLabels" . | nindent 6 }}
+  unhealthyPodEvictionPolicy: {{ .Values.podDisruptionBudget.unhealthyPodEvictionPolicy | default "AlwaysAllow" }}
+{{- end }}

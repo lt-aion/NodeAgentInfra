@@ -1,0 +1,47 @@
+{{- if include "genapp.service.hasPorts" . }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "genapp.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "genapp.labels" . | nindent 4 }}
+spec:
+  type: {{ if .Values.service }}{{ .Values.service.type | default "ClusterIP" }}{{ else }}ClusterIP{{ end }}
+  ports:
+  {{- range .Values.containers }}
+    {{- if .ports }}
+    {{- if .ports.http }}
+    - port: {{ .ports.http }}
+      targetPort: {{ .name }}-http
+      protocol: TCP
+      name: {{ .name }}-http
+      {{- if and (eq ($.Values.service.type | default "ClusterIP") "NodePort") $.Values.service.nodePort }}
+      nodePort: {{ $.Values.service.nodePort }}
+      {{- end }}
+    {{- end }}
+    {{- if .ports.grpc }}
+    - port: {{ .ports.grpc }}
+      targetPort: {{ .name }}-grpc
+      protocol: TCP
+      name: {{ .name }}-grpc
+    {{- end }}
+    {{- if .ports.metrics }}
+    - port: {{ .ports.metrics }}
+      targetPort: {{ .name }}-metrics
+      protocol: TCP
+      name: {{ .name }}-metrics
+    {{- end }}
+    {{- with .ports.additional }}
+    {{- range . }}
+    - port: {{ .containerPort }}
+      targetPort: {{ .name }}
+      protocol: {{ .protocol | default "TCP" }}
+      name: {{ .name }}
+    {{- end }}
+    {{- end }}
+    {{- end }}
+  {{- end }}
+  selector:
+    {{- include "genapp.selectorLabels" . | nindent 4 }}
+{{- end }}

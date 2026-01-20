@@ -1,0 +1,32 @@
+{{- if include "genapp.servicemonitor.hasMetricsPorts" . }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ include "genapp.fullname" . }}
+  {{- if and .Values.serviceMonitor .Values.serviceMonitor.namespace }}
+  namespace: {{ .Release.Namespace }}
+  {{- end }}
+  labels:
+    {{- include "genapp.labels" . | nindent 4 }}
+    {{- if and .Values.serviceMonitor .Values.serviceMonitor.labels }}
+    {{- toYaml .Values.serviceMonitor.labels | nindent 4 }}
+    {{- end }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "genapp.selectorLabels" . | nindent 10 }}
+  endpoints:
+  {{- range .Values.containers }}
+  {{- if and .ports .ports.metrics }}
+  - port: {{ .name }}-metrics
+    path: /metrics
+    interval: 15s
+    honorLabels: true
+    scrapeTimeout: 10s
+  {{- end }}
+  {{- end }}
+  jobLabel: "{{ .Release.Name }}"
+  namespaceSelector:
+    matchNames:
+      - {{ .Release.Namespace }}
+{{- end }}

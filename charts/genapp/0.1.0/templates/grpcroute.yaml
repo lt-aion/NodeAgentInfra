@@ -1,0 +1,46 @@
+{{- range $name, $route := .Values.grpcRoute }}
+  {{- if $route.enabled }}
+---
+apiVersion: {{ $route.apiVersion | default "gateway.networking.k8s.io/v1" }}
+kind: {{ $route.kind | default "GRPCRoute" }}
+metadata:
+  {{- with $route.annotations }}
+  annotations:
+{{ toYaml . | nindent 4 }}
+  {{- end }}
+  name: {{ template "genapp.fullname" $ }}{{ if ne $name "main" }}-{{ $name }}{{ end }}
+  namespace: {{ $.Release.Namespace }}
+  labels:
+    app: {{ template "genapp.name" $ }}
+    {{- include "genapp.labels" $ | nindent 4 }}
+    {{- with $route.labels }}
+{{ toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  {{- with $route.parentRefs }}
+  parentRefs:
+{{ toYaml . | nindent 4 }}
+  {{- end }}
+  {{- with $route.hostnames }}
+  hostnames:
+{{ tpl (toYaml .) $ | nindent 4 }}
+  {{- end }}
+  rules:
+    - {{- /* Single rule only */}}
+      {{- with $route.matches }}
+      matches:
+{{ toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with $route.filters }}
+      filters:
+{{ toYaml . | nindent 8 }}
+      {{- end }}
+      backendRefs:
+        {{- if $route.backendRefs }}
+{{ toYaml $route.backendRefs | nindent 8 }}
+        {{- else }}
+        - name: {{ include "genapp.fullname" $ }}
+          port: {{ $route.servicePort | default 50051 }}
+        {{- end }}
+  {{- end }}
+{{- end }}

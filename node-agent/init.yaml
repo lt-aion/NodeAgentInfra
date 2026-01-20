@@ -1,0 +1,13 @@
+agent:
+    bootstrap_token: ""
+
+server:
+    orchestrator_url: "http://localhost:9002"
+    
+auth:
+    type: "auth0"
+    provider: "aion"
+    provider_url: "http://localhost:9001"
+
+logging:
+    level: "info"

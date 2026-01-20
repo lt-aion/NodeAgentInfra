@@ -1,0 +1,102 @@
+nameOverride: ""
+fullnameOverride: ""
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 5
+  targetCPUUtilizationPercentage: 80
+  targetMemoryUtilizationPercentage: 80
+
+replicaCount: 1
+
+podAnnotations: {}
+podLabels: {}
+
+imagePullSecrets: []
+serviceAccount:
+  create: true
+  automount: true
+  annotations: {}
+  name: ""
+podSecurityContext: {}
+
+containers:
+- name: example
+  image:
+    repository: nginx
+    pullPolicy: IfNotPresent
+    tag: "latest"
+  ports:
+    http: 80
+    # metrics: 9000
+    # grpc: 5122
+  resources:
+    limits:
+      cpu: 200m
+      memory: 256Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+  volumeMounts: []
+  securityContext: {}
+  livenessProbe:
+    httpGet:
+      path: /
+      # name expands to {{ container[*].name }}-{{ http | grpc | metrics }},
+      # else use the port number
+      port: example-http
+  readinessProbe:
+    httpGet:
+      path: /
+      # name expands to {{ container[*].name }}-{{ http | grpc | metrics }},
+      # else use the port number
+      port: example-http
+# - name: httpbin
+#   image:
+#     repository: httpbin
+#     pullPolicy: IfNotPresent
+#     tag: "latest"
+#   ports:
+#     http: 81
+#     metrics: 9001
+#     grpc: 5124
+#     additional:
+#       - name: foo
+#         containerPort: 3223
+#         protocol: TCP
+#       - name: bar
+#         containerPort: 3224
+#         protocol: TCP
+#   resources: {}
+#   volumeMounts: []
+#   securityContext: {}
+#   livenessProbe:
+#     httpGet:
+#       path: /
+#       port: http
+#   readinessProbe:
+#     httpGet:
+#       path: /
+#       port: http
+
+# route:
+#   main:
+#     enabled: true
+#     servicePort: 80
+#     hostnames:
+#       - nginx.dev.internal
+#     parentRefs:
+#       - name: kong-internal
+#         namespace: default
+#         kind: Gateway
+
+volumes: []
+nodeSelector: {}
+affinity: {}
+tolerations: []
+topologySpreadConstraints: []
+
+# podDisruptionBudget:
+#   minAvailable: 1
+#   maxUnavailable: 1
