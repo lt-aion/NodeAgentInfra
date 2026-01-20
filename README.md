@@ -99,8 +99,6 @@ kind delete cluster --name aion-cluster
 
 ---
 
-## Troubleshooting
-
 ### Check Pod Status
 ```bash
 kubectl get pods -A
@@ -111,3 +109,8 @@ kubectl get pods -A
 kubectl logs -f deployment/authn-svc
 kubectl logs -f deployment/task-svc
 ```
+
+### References
+
+- For setting up headless sso: https://docs.aws.amazon.com/cli/latest/reference/sso/login.html
+- For docker image pull ecr auth: https://stackoverflow.com/a/73332364
