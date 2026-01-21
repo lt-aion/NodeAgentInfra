@@ -55,6 +55,10 @@ docker pull 056562102950.dkr.ecr.ap-south-1.amazonaws.com/aion/nodeagent-task-sv
 # Load into Kind
 kind load docker-image 056562102950.dkr.ecr.ap-south-1.amazonaws.com/aion/nodeagent-authn-svc:latest --name aion-cluster
 kind load docker-image 056562102950.dkr.ecr.ap-south-1.amazonaws.com/aion/nodeagent-task-svc:latest --name aion-cluster
+
+# Restart deployments to pick up new images
+kubectl rollout restart deployment/authn-svc
+kubectl rollout restart deployment/task-svc
 ```
 
 ### 3. Deploy Applications
